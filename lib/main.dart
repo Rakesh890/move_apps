@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_app/injector.dart';
 import 'package:movie_app/presentation/blocs/home_bloc/home_bloc.dart';
 import 'package:movie_app/presentation/blocs/landing/landing_bloc.dart';
+import 'package:movie_app/presentation/blocs/movies_details/movie_details_bloc.dart';
 import 'core/routing/routes.dart';
 import 'package:movie_app/injector.dart' as di;
 
@@ -20,10 +21,11 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => LandingBloc(),),
-        BlocProvider(create: (context) => HomeBloc(trendingMovieUseCase: serviceLocator()),)
+        BlocProvider(create: (context) => HomeBloc(trendingMovieUseCase: serviceLocator()),),
+        BlocProvider(create: (context) => MovieDetailsBloc(trendingMovieUseCase: serviceLocator()),),
       ],
       child: MaterialApp(
-        debugShowCheckedModeBanner: true,
+        debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         darkTheme: ThemeData.dark(useMaterial3: true,),
         theme: ThemeData(

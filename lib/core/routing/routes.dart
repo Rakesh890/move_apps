@@ -17,7 +17,8 @@ class Routes {
       case movies:
         return MaterialPageRoute(builder: (_) => const MyMoviesPage());
       case moviesDetail:
-        return MaterialPageRoute(builder: (_) => const MoviesDetailsPage());
+        final args = settings.arguments as dynamic;
+        return MaterialPageRoute(builder: (_) =>  MoviesDetailsPage(movieId: args["movieId"]),);
       case landing:
         return MaterialPageRoute(builder: (_) => const LandingPage());
       default:

@@ -8,5 +8,11 @@ class ApiConfig{
   static const String getAllMoviesUrl = "";
   static const String getMovieDetailUrl = "";
   static const String tredingMovieUrl = "$baseUrl/trending/all/week?language=en-US&api_key=$apiKey";
+  static const String nowPlayingMovieUrl = "$baseUrl/movie/now_playing?api_key=$apiKey";
+  static const String topRateedMoviesUrll ="$baseUrl/movie/top_rated?api_key=$apiKey";
+  static const String mostPopularMovieUrl ="$baseUrl/movie/popular?api_key=$apiKey";
+  static const String movieDetails = "$baseUrl/movie/";
+  static const String recommedMoviesUrl = "$baseUrl/movie/";
+
 
 }
