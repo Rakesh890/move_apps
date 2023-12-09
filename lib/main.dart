@@ -31,11 +31,6 @@ class MyApp extends StatelessWidget {
         darkTheme: ThemeData.dark(useMaterial3: true,),
         theme: ThemeData(
             useMaterial3: true, scaffoldBackgroundColor: Colors.black,
-        textTheme: const TextTheme(
-          titleLarge: TextStyle(color: Colors.white,fontSize: 18.0,fontWeight: FontWeight.w700),
-          titleMedium: TextStyle(color: Colors.white,fontSize: 16.0,fontWeight: FontWeight.w500),
-          titleSmall: TextStyle(color: Colors.white,fontSize: 14.0,fontWeight: FontWeight.w500),
-        ),
         appBarTheme: const AppBarTheme(
           color: Colors.black,
         )),
