@@ -20,6 +20,10 @@ class MovieTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(12.0),
             child: SizedBox(
               child: CachedNetworkImage(
+                errorWidget: (context, url, error) => Image.asset("assets/images/placeholder.png",
+                    fit: BoxFit.cover),
+                placeholder: (context, url) => Image.asset("assets/images/placeholder.png",
+                fit: BoxFit.cover),
                 imageUrl:
                     "${ApiConfig.imageUrl}w500${movieTrendingItem.posterPath}",
                 fit: BoxFit.fitWidth,

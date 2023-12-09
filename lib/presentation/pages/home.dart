@@ -56,56 +56,59 @@ class _HomePageState extends State<HomePage> {
       extendBodyBehindAppBar: true,
       body: SafeArea(
           child: SingleChildScrollView(
-        child: Column(
-          children: [
-            BlocBuilder<HomeBloc, HomeState>(
-                builder: (context, state) {
-                  debugPrint(state.runtimeType.toString());
-                  if (state is HomeMovieTrendingResponse) {
-                    return SizedBox(
-                      width: double.infinity,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          buildViewMovieSections(
-                              moviesList: state.movieTrendingList,
-                              headingOfSectionName: "Trending Movie's"),
-                          10.h,
-                          buildViewMovieSections(
-                              moviesList: state.topRatedMoviesList,
-                              headingOfSectionName: "Top Rated Movie's"),
-                          10.h,
-                          buildViewMovieSections(
-                              moviesList: state.popularMovieList,
-                              headingOfSectionName: "Most Popular Movie's"),
-                          10.h,
-                          buildViewMovieSections(
-                              moviesList: state.nowPlayingList,
-                              headingOfSectionName: "Now Playing Movie's"),
-                        ],
-                      ),
-                    );
-                  }
-                  else if (state is HomeMovieTrendingError) {
-                    return const Center(
-                      child: Text(
-                        "Error Occure",
-                        style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white),
-                      ),
-                    );
-                  } else {
-                    return  const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                },
-                bloc: homeBloc),
-          ],
-        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0,vertical: 10),
+          child: Column(
+            children: [
+              BlocBuilder<HomeBloc, HomeState>(
+                  builder: (context, state) {
+                    debugPrint(state.runtimeType.toString());
+                    if (state is HomeMovieTrendingResponse) {
+                      return SizedBox(
+                        width: double.infinity,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            buildViewMovieSections(
+                                moviesList: state.movieTrendingList,
+                                headingOfSectionName: "Trending Movie's"),
+                            10.h,
+                            buildViewMovieSections(
+                                moviesList: state.topRatedMoviesList,
+                                headingOfSectionName: "Top Rated Movie's"),
+                            10.h,
+                            buildViewMovieSections(
+                                moviesList: state.popularMovieList,
+                                headingOfSectionName: "Most Popular Movie's"),
+                            10.h,
+                            buildViewMovieSections(
+                                moviesList: state.nowPlayingList,
+                                headingOfSectionName: "Now Playing Movie's"),
+                          ],
+                        ),
+                      );
+                    }
+                    else if (state is HomeMovieTrendingError) {
+                      return const Center(
+                        child: Text(
+                          "Something Went Wrong",
+                          style: TextStyle(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white),
+                        ),
+                      );
+                    } else {
+                      return  const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  },
+                  bloc: homeBloc),
+            ],
+          ),
+        )
       )),
     );
   }
@@ -117,11 +120,13 @@ class _HomePageState extends State<HomePage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
+        10.h,
         Text(
           headingOfSectionName,
           style: const TextStyle(
               color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18.0),
         ),
+        10.h,
         SizedBox(
             height: 180,
             width: MediaQuery.of(context).size.width,
