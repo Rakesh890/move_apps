@@ -5,6 +5,7 @@ import 'package:movie_app/core/routing/routes.dart';
 import 'package:movie_app/domain/entity/movie_entity.dart';
 import 'package:movie_app/injector.dart';
 import 'package:movie_app/presentation/blocs/home_bloc/home_bloc.dart';
+import 'package:movie_app/presentation/widgets/app_loading.dart';
 import 'package:movie_app/presentation/widgets/custom_appbar.dart';
 import 'package:movie_app/presentation/widgets/movie_tile.dart';
 import 'package:movie_app/utils/extensions/sized_box_extension.dart';
@@ -31,16 +32,13 @@ class _HomePageState extends State<HomePage> {
       appBar: PreferredSize(
           preferredSize: const Size.fromHeight(50.0),
           child: MyAppbar(
-            leadingWidget: const SizedBox(),
             userName: BlocBuilder<HomeBloc, HomeState>(
               builder: (context, state) {
-                if (state is UserApiLoading) {
-                  return const Text("");
-                } else if (state is UserResponse) {
+                if (state is UserResponse) {
                   return Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      state.userInfoEntity.username.toString().toUpperCase(),
+                      state.userInfoEntity.username.toString(),
                       style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18.0,
@@ -88,7 +86,8 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     );
-                  } else if (state is HomeMovieTrendingError) {
+                  }
+                  else if (state is HomeMovieTrendingError) {
                     return const Center(
                       child: Text(
                         "Error Occure",
@@ -99,7 +98,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     );
                   } else {
-                    return const Center(
+                    return  const Center(
                       child: CircularProgressIndicator(),
                     );
                   }

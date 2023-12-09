@@ -20,9 +20,12 @@ class MyAppbar extends StatelessWidget {
           filter: ImageFilter.blur(
               sigmaX: 100, sigmaY: 200, tileMode: TileMode.mirror),
           child: AppBar(
+            elevation: 5,
+            automaticallyImplyLeading: true,
+            leadingWidth: (leadingWidget != null) ? 50 : 0,
             leading: leadingWidget ?? const SizedBox(),
             // ignore: prefer_const_constructors
-            backgroundColor: Colors.black.withOpacity(0.30),
+            backgroundColor: Colors.black.withOpacity(0.10),
             title: userName,
             actions: actionButton,
           )),

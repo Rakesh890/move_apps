@@ -11,6 +11,7 @@ import 'package:movie_app/presentation/widgets/custom_appbar.dart';
 import 'package:movie_app/utils/extensions/sized_box_extension.dart';
 
 import '../../core/routing/routes.dart';
+import '../blocs/home_bloc/home_bloc.dart';
 import '../widgets/movie_tile.dart';
 
 class MyMoviesPage extends StatefulWidget {
@@ -34,6 +35,7 @@ class _MyMoviesPageState extends State<MyMoviesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         extendBodyBehindAppBar: true,
+        extendBody: true,
         appBar: PreferredSize(
             preferredSize: const Size.fromHeight(50.0),
             child: MyAppbar(
@@ -53,9 +55,25 @@ class _MyMoviesPageState extends State<MyMoviesPage> {
                       size: 32,
                     ))
               ],
-              userName: const Text(
-                "Rakesh",
-                style: TextStyle(color: Colors.white, fontSize: 18.0),
+              userName:BlocBuilder<HomeBloc, HomeState>(
+                builder: (context, state) {
+                  if (state is UserApiLoading) {
+                    return const Text("");
+                  } else if (state is UserResponse) {
+                    return Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        state.userInfoEntity.username.toString(),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    );
+                  }
+                  return const Text("");
+                },
+                bloc: serviceLocator<HomeBloc>()..add(CallUserInfoApiEvent()),
               ),
             )),
         body: SafeArea(
@@ -71,6 +89,7 @@ class _MyMoviesPageState extends State<MyMoviesPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    10.h,
                     ListTile(
                       dense: true,
                       visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -100,17 +119,6 @@ class _MyMoviesPageState extends State<MyMoviesPage> {
                                     moviesList: state.movieEntity.results!,
                                     headingOfSectionName: "Watch List"),
                                 10.h,
-                                buildViewMovieSections(
-                                    moviesList: state.movieEntity.results!,
-                                    headingOfSectionName: "Recently Watched"),
-                                10.h,
-                                buildViewMovieSections(
-                                    moviesList: state.movieEntity.results!,
-                                    headingOfSectionName: "Recently Watched"),
-                                10.h,
-                                buildViewMovieSections(
-                                    moviesList: state.movieEntity.results!,
-                                    headingOfSectionName: "Recently Watched")
                               ],
                             );
                           } else if (state is MyMovieWatchListError) {
