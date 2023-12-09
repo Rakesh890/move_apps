@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_app/core/constants/api_config.dart';
 import 'package:movie_app/injector.dart';
 import 'package:movie_app/presentation/widgets/button_widget.dart';
+import 'package:movie_app/presentation/widgets/movie_tile.dart';
 import 'package:movie_app/utils/extensions/sized_box_extension.dart';
 import 'package:movie_app/utils/extensions/time_conversion.dart';
 import 'package:video_player/video_player.dart';
@@ -27,9 +28,12 @@ class _MoviesDetailsPageState extends State<MoviesDetailsPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    callTheApi(widget.movieId);
+  }
+
+  callTheApi(movieId) {
     movieBloc.add(FetchMovieDetailsFromApiEvent(
-        apiUrl:
-            "${ApiConfig.movieDetails}/${widget.movieId}?${ApiConfig.apiKey}"));
+        apiUrl: "${ApiConfig.movieDetails}/${movieId}?${ApiConfig.apiKey}"));
   }
 
   @override
@@ -48,62 +52,92 @@ class _MoviesDetailsPageState extends State<MoviesDetailsPage> {
           automaticallyImplyLeading: true,
           backgroundColor: Colors.black.withOpacity(0.7),
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              BlocBuilder<MovieDetailsBloc, MovieDetailsState>(
-                builder: (context, state) {
-                  if (state is MovieLoading) {
-                    return const CircularProgressIndicator();
-                  }
-                  return mainBody(state);
-                },
-                bloc: serviceLocator<MovieDetailsBloc>()
-                  ..add(FetchMovieDetailsFromApiEvent(
-                      apiUrl:
-                          "${ApiConfig.movieDetails}/${widget.movieId}?${ApiConfig.apiKey}")),
-              ),
-              BlocBuilder<MovieDetailsBloc, MovieDetailsState>(
-                builder: (context, state) {
-                  if (state is LoadinRecommendedMovie) {
-                    return const CircularProgressIndicator();
-                  } else if (state is RecommendedMoviesResponse) {
-                    debugPrint(state.recommendedMoviesList.length.toString());
-                    return GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 8.0,
-                        mainAxisSpacing: 8.0,
-                      ),
-                      itemCount: state.recommendedMoviesList
-                          .length, // Number of items in the grid
-                      itemBuilder: (BuildContext context, int index) {
-                        return GridTile(
-                          child: Container(
-                            color: Colors.blue,
-                            child: Center(
-                              child: Text('Item $index'),
-                            ),
+        body: BlocConsumer<MovieDetailsBloc, MovieDetailsState>(
+          listener: (context, state) {},
+          builder: (context, state) {
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  BlocBuilder<MovieDetailsBloc, MovieDetailsState>(
+                    builder: (context, state) {
+                      if (state is MovieError) {
+                        return const Center(
+                          child: Text(
+                            "Something went wrong",
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 18.0),
                           ),
                         );
-                      },
-                    );
-                  } else {
-                    return const Text("Happing");
-                  }
-                },
-                bloc: serviceLocator<MovieDetailsBloc>()
-                  ..add(FetchRecommendedMovieEvent(
-                      apiUrl:
-                          "${ApiConfig.recommedMoviesUrl}/${widget.movieId}/recommendations?${ApiConfig.apiKey}")),
+                      } else if (state is MovieDetailResponse) {
+                        return mainBody(state);
+                      }
+                      return const CircularProgressIndicator();
+                    },
+                    bloc: serviceLocator<MovieDetailsBloc>()
+                      ..add(FetchMovieDetailsFromApiEvent(
+                          apiUrl:
+                              "${ApiConfig.movieDetails}/${widget.movieId}?${ApiConfig.apiKey}")),
+                  ),
+                  15.h,
+                  const Text(
+                    "More Like This",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  8.h,
+                  recommendedView(),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         ));
+  }
+
+  Widget recommendedView() {
+    return BlocBuilder<MovieDetailsBloc, MovieDetailsState>(
+      builder: (context, state) {
+        if (state is LoadinRecommendedMovie) {
+          return const CircularProgressIndicator();
+        } else if (state is RecommendedMoviesResponse) {
+          debugPrint(state.recommendedMoviesList.length.toString());
+          return GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 3.0,
+              mainAxisSpacing: 3.0,
+              childAspectRatio: 0.8,
+            ),
+            itemCount: state
+                .recommendedMoviesList.length, // Number of items in the grid
+            itemBuilder: (BuildContext context, int index) {
+              return GridTile(
+                  child: MovieTile(
+                      movieTrendingItem: state.recommendedMoviesList[index],
+                      onPress: () {
+                        debugPrint("Api Calling");
+                        serviceLocator<MovieDetailsBloc>().add(
+                            FetchMovieDetailsFromApiEvent(
+                                apiUrl:
+                                    "${ApiConfig.movieDetails}/${state.recommendedMoviesList[index].id}?${ApiConfig.apiKey}"));
+                      }));
+            },
+          );
+       
+        } else {
+          return const Text("Happing");
+        }
+      },
+      bloc: serviceLocator<MovieDetailsBloc>()
+        ..add(FetchRecommendedMovieEvent(
+            apiUrl:
+                "${ApiConfig.recommedMoviesUrl}/${widget.movieId}/recommendations?${ApiConfig.apiKey}")),
+    );
   }
 
   Widget buildVerticalButton(
@@ -135,13 +169,14 @@ class _MoviesDetailsPageState extends State<MoviesDetailsPage> {
           ),
         ),
       );
-  Widget mainBody(state) {
+
+  Widget mainBody(MovieDetailResponse movieResponseState) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         CachedNetworkImage(
             imageUrl:
-                "${ApiConfig.imageUrl}/w500/${state.movieDetailEntity.posterPath}",
+                "${ApiConfig.imageUrl}/w500/${movieResponseState.movieDetailEntity.posterPath}",
             height: 500,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover),
@@ -150,7 +185,7 @@ class _MoviesDetailsPageState extends State<MoviesDetailsPage> {
           mainAxisSize: MainAxisSize.max,
           children: [
             Text(
-              state.movieDetailEntity.title.toString(),
+              movieResponseState.movieDetailEntity.title.toString(),
               style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18.0,
@@ -160,7 +195,7 @@ class _MoviesDetailsPageState extends State<MoviesDetailsPage> {
             RichText(
               text: TextSpan(
                 text:
-                    "${state.movieDetailEntity.popularity!.floorToDouble() / 10} % match"
+                    "${movieResponseState.movieDetailEntity.popularity!.floorToDouble() / 10} % match"
                         .toString(),
                 style: const TextStyle(
                     color: Colors.green,
@@ -168,7 +203,8 @@ class _MoviesDetailsPageState extends State<MoviesDetailsPage> {
                     fontSize: 14.0),
                 children: <TextSpan>[
                   TextSpan(
-                    text: ' ${state.movieDetailEntity.releaseDate} ',
+                    text:
+                        ' ${movieResponseState.movieDetailEntity.releaseDate} ',
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.white),
                   ),
@@ -200,7 +236,7 @@ class _MoviesDetailsPageState extends State<MoviesDetailsPage> {
             ),
             10.h,
             Text(
-              state.movieDetailEntity.overview.toString(),
+              movieResponseState.movieDetailEntity.overview.toString(),
               style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w500,
@@ -210,8 +246,33 @@ class _MoviesDetailsPageState extends State<MoviesDetailsPage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                buildVerticalButton(
-                    iconName: Icons.add, name: "My List", onPress: () {}),
+                BlocBuilder<MovieDetailsBloc, MovieDetailsState>(
+                  buildWhen: (previous, current) {
+                    debugPrint("Previos $previous and Current $current");
+                    return true;
+                  },
+                  builder: ((context, state) {
+                    if (state is AddedMovieInWatchList) {
+                      return buildVerticalButton(
+                          iconName: Icons.check, name: "Done", onPress: () {});
+                    }
+                    return buildVerticalButton(
+                        iconName: Icons.add,
+                        name: "My List",
+                        onPress: () {
+                          serviceLocator<MovieDetailsBloc>().add(
+                              AddMovieInWatchListEvent(
+                                  url: ApiConfig.addWatchMoveInWatchlist,
+                                  bodyRequest: {
+                                "media_type": "movie",
+                                "media_id":
+                                    movieResponseState.movieDetailEntity.id,
+                                "watchlist": true
+                              }));
+                        });
+                  }),
+                  bloc: serviceLocator<MovieDetailsBloc>(),
+                ),
                 buildVerticalButton(
                     iconName: Icons.thumb_up_alt_outlined,
                     name: "Rate",

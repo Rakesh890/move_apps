@@ -1,12 +1,12 @@
 import 'package:equatable/equatable.dart';
 
-class TrendingMovieEntity extends Equatable{
+class MovieEntity extends Equatable{
   final int? page;
   final List<ResultsEntity>? results;
   final int? totalPages;
   final int? totalResults;
 
-  TrendingMovieEntity({
+  MovieEntity({
     this.page,
     this.results,
     this.totalPages,

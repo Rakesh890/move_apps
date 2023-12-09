@@ -21,8 +21,9 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => LandingBloc(),),
-        BlocProvider(create: (context) => HomeBloc(trendingMovieUseCase: serviceLocator()),),
-        BlocProvider(create: (context) => MovieDetailsBloc(trendingMovieUseCase: serviceLocator()),),
+        BlocProvider(create: (context) => HomeBloc(trendingMovieUseCase: serviceLocator(),
+        userUseCase: serviceLocator()),),
+        BlocProvider(create: (context) => MovieDetailsBloc(trendingMovieUseCase: serviceLocator(),watchListUseCase: serviceLocator()),),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

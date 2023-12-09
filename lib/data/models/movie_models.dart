@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
-import 'package:movie_app/domain/entity/trending_movie_entity.dart';
+import 'package:movie_app/domain/entity/movie_entity.dart';
 
-class TrendingMovieModels extends TrendingMovieEntity with EquatableMixin{
+class MovieModels extends MovieEntity with EquatableMixin{
 
   final int? page;
 
@@ -11,15 +11,15 @@ class TrendingMovieModels extends TrendingMovieEntity with EquatableMixin{
 
   final int? totalResults;
 
-  TrendingMovieModels({
+  MovieModels({
     this.page,
     this.results,
     this.totalPages,
     this.totalResults,
   });
 
-  factory TrendingMovieModels.fromJson(Map<String, dynamic> json){
-    return TrendingMovieModels(
+  factory MovieModels.fromJson(Map<String, dynamic> json){
+    return MovieModels(
         page : json['page'] as int?,
         results: (json['results'] as List?)?.map((dynamic e) => Results.fromJson(e as Map<String,dynamic>)).toList(),
         totalPages : json['total_pages'] as int?,

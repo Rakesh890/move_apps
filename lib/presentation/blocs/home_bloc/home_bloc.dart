@@ -6,86 +6,73 @@ import 'package:flutter/cupertino.dart';
 import 'package:meta/meta.dart';
 import 'package:movie_app/core/constants/api_config.dart';
 import 'package:movie_app/core/error/app_exception.dart';
-import 'package:movie_app/domain/entity/trending_movie_entity.dart';
+import 'package:movie_app/domain/entity/movie_entity.dart';
+import 'package:movie_app/domain/entity/user_info_entity.dart';
+import 'package:movie_app/domain/usecase/user_usecase.dart';
 
-import '../../../domain/usecase/trending_movie_usecase.dart';
+import '../../../domain/usecase/movie_usecase.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  final TrendingMovieUseCase trendingMovieUseCase;
+  final MovieUseCase trendingMovieUseCase;
+  final UserUseCase userUseCase;
+
   List<ResultsEntity> movieTrendingList = [];
   List<ResultsEntity> nowPlayingMovies = [];
   List<ResultsEntity> topRatedMoviesList = [];
   List<ResultsEntity> popularMovieList = [];
 
-  HomeBloc({required this.trendingMovieUseCase}) : super(HomeMovieTrendingLoading())
-  {
+  HomeBloc({required this.trendingMovieUseCase, required this.userUseCase})
+      : super(HomeMovieTrendingLoading()) {
+    on<CallUserInfoApiEvent>(_fetchUserInfo);
     on<CallTrendingMoviesApiEvent>(_fetchData);
   }
-
-
-  // Future<void> getTrendingMovies(HomeEvent event, Emitter<HomeState> emit) async {
-  //   final results = await trendingMovieUseCase.getAllTrendingMovies(url: ApiConfig.tredingMovieUrl);
-  //   results.fold((response) {
-  //     movieTrendingList.addAll(response!.results!);
-  //     emit(HomeMovieTrendingResponse(trendingMovieEntity: response,
-  //         movieTrendingList: movieTrendingList
-  //     ));
-  //   }, (error) {
-  //     emit(HomeMovieTrendingError());
-  //   });
-  // }
-  //
-  // Future<void> getPlayingMovie(HomeEvent event, Emitter<HomeState> emit) async {
-  //   final results = await trendingMovieUseCase.getAllTrendingMovies(url: ApiConfig.nowPlayingMovieUrl);
-  //   results.fold((response) {
-  //     debugPrint("Now Playing ${response.results!.first.title.toString()}");
-  //     nowPlayingMovies.addAll(response!.results!);
-  //     emit(HomeNowPlayingResponse(nowPlayingList:nowPlayingMovies, trendingMovieEntity: response));
-  //   }, (error) {
-  //     emit(HomeNowPlayingMovieError());
-  //   });
-  // }
 
   ///Execute All api as parally
   Future<void> _fetchData(HomeEvent event, Emitter<HomeState> emit) async {
     try {
-      final List<Either<TrendingMovieEntity,AppException>> results = await Future.wait([
-      trendingMovieUseCase.getMovies(url: ApiConfig.tredingMovieUrl),//Trending
-      trendingMovieUseCase.getMovies(url: ApiConfig.nowPlayingMovieUrl),//Now playing
-      trendingMovieUseCase.getMovies(url: ApiConfig.topRateedMoviesUrll),//Top Rated
-      trendingMovieUseCase.getMovies(url: ApiConfig.mostPopularMovieUrl),//Popular Movies
+      final List<Either<MovieEntity, AppException>> results =
+          await Future.wait([
+        trendingMovieUseCase.getMovies(
+            url: ApiConfig.tredingMovieUrl), //Trending
+        trendingMovieUseCase.getMovies(
+            url: ApiConfig.nowPlayingMovieUrl), //Now playing
+        trendingMovieUseCase.getMovies(
+            url: ApiConfig.topRateedMoviesUrll), //Top Rated
+        trendingMovieUseCase.getMovies(url: ApiConfig.mostPopularMovieUrl),
+        //Popular Movies
       ]);
 
-      Either<TrendingMovieEntity,AppException> trendingResponse = results[0];
-      Either<TrendingMovieEntity,AppException> nowPlayingResponse = results[1];
-      Either<TrendingMovieEntity,AppException> topRatedMovieResponse = results[2];
-      Either<TrendingMovieEntity,AppException> mostPopularMovieResponse = results[3];
+      Either<MovieEntity, AppException> trendingResponse = results[0];
+      Either<MovieEntity, AppException> nowPlayingResponse = results[1];
+      Either<MovieEntity, AppException> topRatedMovieResponse = results[2];
+      Either<MovieEntity, AppException> mostPopularMovieResponse = results[3];
 
       ///Get First Trending Response
       trendingResponse.fold((results) {
         movieTrendingList.clear();
         movieTrendingList.addAll(results.results!);
-          emit(HomeMovieTrendingResponse(
+        emit(HomeMovieTrendingResponse(
             movieTrendingList: movieTrendingList,
             trendingMovieEntity: results,
             nowPlayingList: nowPlayingMovies,
-          popularMovieList: popularMovieList,
-          topRatedMoviesList: topRatedMoviesList));
-            }, (r) => emit(HomeMovieTrendingError()));
+            popularMovieList: popularMovieList,
+            topRatedMoviesList: topRatedMoviesList));
+      }, (r) => emit(HomeMovieTrendingError()));
+
       ///Now playing Releated Movies data got it
       nowPlayingResponse.fold((results) {
         nowPlayingMovies.clear();
         nowPlayingMovies.addAll(results.results!);
         emit(HomeMovieTrendingResponse(
-          movieTrendingList: movieTrendingList,
-          trendingMovieEntity: results,
-          nowPlayingList: nowPlayingMovies,
+            movieTrendingList: movieTrendingList,
+            trendingMovieEntity: results,
+            nowPlayingList: nowPlayingMovies,
             popularMovieList: popularMovieList,
-            topRatedMoviesList: topRatedMoviesList
-        ));}, (r) => emit(HomeMovieTrendingError()));
+            topRatedMoviesList: topRatedMoviesList));
+      }, (r) => emit(HomeMovieTrendingError()));
 
       ///topRatedMovieResponse Movies data got it
       topRatedMovieResponse.fold((results) {
@@ -96,9 +83,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             trendingMovieEntity: results,
             nowPlayingList: nowPlayingMovies,
             popularMovieList: popularMovieList,
-            topRatedMoviesList: topRatedMoviesList
-        ));}, (r) => emit(HomeMovieTrendingError()));
-
+            topRatedMoviesList: topRatedMoviesList));
+      }, (r) => emit(HomeMovieTrendingError()));
 
       ///mostPopularMovieResponse Movies data got it
       mostPopularMovieResponse.fold((results) {
@@ -109,13 +95,23 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             trendingMovieEntity: results,
             nowPlayingList: nowPlayingMovies,
             popularMovieList: popularMovieList,
-            topRatedMoviesList: topRatedMoviesList
-        ));}, (r) => emit(HomeMovieTrendingError()));
-
-
-
+            topRatedMoviesList: topRatedMoviesList));
+      }, (r) => emit(HomeMovieTrendingError()));
     } catch (error) {
       emit(HomeMovieTrendingError());
+    }
+  }
+
+  FutureOr<void> _fetchUserInfo(event, Emitter<HomeState> emit) async {
+    emit(UserApiLoading());
+    try {
+      final userData =
+          await userUseCase.getUserInfo(url: ApiConfig.accountDetailsUrl);
+      userData.fold((data) {
+        emit(UserResponse(userInfoEntity: data));
+      }, (error) => emit(UserError()));
+    } catch (err) {
+      emit(UserError());
     }
   }
 }

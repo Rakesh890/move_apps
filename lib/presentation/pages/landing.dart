@@ -19,29 +19,34 @@ class LandingPage extends StatelessWidget {
               index: state.tabIndex,
               children: const [HomePage(), MyMoviesPage()],
             ),
-            bottomNavigationBar:ClipRect(
-              child: BackdropFilter(filter: ImageFilter.blur(sigmaX: 20,sigmaY: 20),
-              child: BottomNavigationBar(
-                  selectedIconTheme: const IconThemeData(color: Colors.white),
-                  unselectedIconTheme: const IconThemeData(color: Colors.grey),
-                  selectedItemColor: Colors.white,
-                  unselectedItemColor: Colors.grey,
-                  currentIndex: state.tabIndex,
-                  onTap: (values) {
-                    BlocProvider.of<LandingBloc>(context).add(BottomTabChanges(tabIndex: values));
-                  },
-                  backgroundColor: Colors.black54.withOpacity(0.70),
-                  type: BottomNavigationBarType.fixed,
-                  items: const [
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.home),
-                      label: "Home",
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.person),
-                      label: "My Profile",
-                    ),
-                  ])),
+            bottomNavigationBar: ClipRect(
+              child: BackdropFilter(
+                  filter: ImageFilter.blur(
+                      sigmaX: 100, sigmaY: 200, tileMode: TileMode.mirror),
+                  child: BottomNavigationBar(
+                      selectedIconTheme:
+                          const IconThemeData(color: Colors.white),
+                      unselectedIconTheme:
+                          const IconThemeData(color: Colors.grey),
+                      selectedItemColor: Colors.white,
+                      unselectedItemColor: Colors.grey,
+                      currentIndex: state.tabIndex,
+                      onTap: (values) {
+                        BlocProvider.of<LandingBloc>(context)
+                            .add(BottomTabChanges(tabIndex: values));
+                      },
+                      backgroundColor: Colors.black54.withOpacity(0.10),
+                      type: BottomNavigationBarType.fixed,
+                      items: const [
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.home),
+                          label: "Home",
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.person),
+                          label: "My Profile",
+                        ),
+                      ])),
             ));
       },
     );

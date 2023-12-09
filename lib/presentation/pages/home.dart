@@ -2,9 +2,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_app/core/routing/routes.dart';
-import 'package:movie_app/domain/entity/trending_movie_entity.dart';
+import 'package:movie_app/domain/entity/movie_entity.dart';
 import 'package:movie_app/injector.dart';
 import 'package:movie_app/presentation/blocs/home_bloc/home_bloc.dart';
+import 'package:movie_app/presentation/widgets/custom_appbar.dart';
 import 'package:movie_app/presentation/widgets/movie_tile.dart';
 import 'package:movie_app/utils/extensions/sized_box_extension.dart';
 
@@ -21,16 +22,38 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     homeBloc.add(CallTrendingMoviesApiEvent());
+    homeBloc.add(CallUserInfoApiEvent());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.30),
-        elevation: 10,
-        leading: const SizedBox(),
-      ),
+      appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(50.0),
+          child: MyAppbar(
+            leadingWidget: const SizedBox(),
+            userName: BlocBuilder<HomeBloc, HomeState>(
+              builder: (context, state) {
+                if (state is UserApiLoading) {
+                  return const Text("");
+                } else if (state is UserResponse) {
+                  return Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      state.userInfoEntity.username.toString().toUpperCase(),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  );
+                }
+                return const Text("");
+              },
+              bloc: serviceLocator<HomeBloc>()..add(CallUserInfoApiEvent()),
+            ),
+            actionButton: const [],
+          )),
       extendBody: true,
       extendBodyBehindAppBar: true,
       body: SafeArea(
@@ -47,13 +70,21 @@ class _HomePageState extends State<HomePage> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildViewMovieSections(moviesList: state.movieTrendingList, headingOfSectionName: "Trending Movie's"),
+                          buildViewMovieSections(
+                              moviesList: state.movieTrendingList,
+                              headingOfSectionName: "Trending Movie's"),
                           10.h,
-                          buildViewMovieSections(moviesList: state.topRatedMoviesList, headingOfSectionName: "Top Rated Movie's"),
+                          buildViewMovieSections(
+                              moviesList: state.topRatedMoviesList,
+                              headingOfSectionName: "Top Rated Movie's"),
                           10.h,
-                          buildViewMovieSections(moviesList: state.popularMovieList, headingOfSectionName: "Most Popular Movie's"),
+                          buildViewMovieSections(
+                              moviesList: state.popularMovieList,
+                              headingOfSectionName: "Most Popular Movie's"),
                           10.h,
-                          buildViewMovieSections(moviesList: state.nowPlayingList, headingOfSectionName: "Now Playing Movie's"),
+                          buildViewMovieSections(
+                              moviesList: state.nowPlayingList,
+                              headingOfSectionName: "Now Playing Movie's"),
                         ],
                       ),
                     );
@@ -80,12 +111,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildViewMovieSections({required List<ResultsEntity> moviesList,required String headingOfSectionName}) {
+  Widget buildViewMovieSections(
+      {required List<ResultsEntity> moviesList,
+      required String headingOfSectionName}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-         Text(
+        Text(
           headingOfSectionName,
           style: const TextStyle(
               color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18.0),

@@ -5,34 +5,29 @@ abstract class HomeState {}
 class HomeMovieTrendingLoading extends HomeState {}
 
 class HomeMovieTrendingResponse extends HomeState {
-  TrendingMovieEntity trendingMovieEntity;
+  MovieEntity trendingMovieEntity;
   List<ResultsEntity> movieTrendingList = [];
   List<ResultsEntity> nowPlayingList = [];
   List<ResultsEntity> topRatedMoviesList = [];
   List<ResultsEntity> popularMovieList = [];
-  HomeMovieTrendingResponse({required this.trendingMovieEntity,
-    required this.movieTrendingList,
-    required this.nowPlayingList,
-    required this.popularMovieList,
-    required this.topRatedMoviesList
-  });
+  HomeMovieTrendingResponse(
+      {required this.trendingMovieEntity,
+      required this.movieTrendingList,
+      required this.nowPlayingList,
+      required this.popularMovieList,
+      required this.topRatedMoviesList});
 }
+
 class HomeMovieTrendingError extends HomeState {
   HomeMovieTrendingError();
 }
 
+class UserApiLoading extends HomeState {}
 
-class LoadingPlayingMovie extends HomeState {}
+class UserResponse extends HomeState {
+  final UserInfoEntity userInfoEntity;
 
-class HomeNowPlayingResponse extends HomeState {
-  TrendingMovieEntity trendingMovieEntity;
-  List<ResultsEntity> nowPlayingList = [];
-  HomeNowPlayingResponse({required this.trendingMovieEntity,
-    required this.nowPlayingList
-  });
-}
-class HomeNowPlayingMovieError extends HomeState {
-  HomeNowPlayingMovieError();
+  UserResponse({required this.userInfoEntity});
 }
 
-
+class UserError extends HomeState {}

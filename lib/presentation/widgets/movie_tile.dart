@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_app/core/constants/api_config.dart';
-import 'package:movie_app/domain/entity/trending_movie_entity.dart';
+import 'package:movie_app/domain/entity/movie_entity.dart';
 
 class MovieTile extends StatelessWidget {
   final ResultsEntity movieTrendingItem;
@@ -22,7 +22,7 @@ class MovieTile extends StatelessWidget {
               child: CachedNetworkImage(
                 imageUrl:
                     "${ApiConfig.imageUrl}w500${movieTrendingItem.posterPath}",
-                fit: BoxFit.contain,
+                fit: BoxFit.fitWidth,
               ),
             ),
           ),
