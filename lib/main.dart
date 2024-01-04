@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movie_app/injector.dart';
-import 'package:movie_app/presentation/blocs/home_bloc/home_bloc.dart';
-import 'package:movie_app/presentation/blocs/landing/landing_bloc.dart';
-import 'package:movie_app/presentation/blocs/movies_details/movie_details_bloc.dart';
-import 'core/routing/routes.dart';
+import 'package:movie_app/core/routes/routes.dart';
 import 'package:movie_app/injector.dart' as di;
+import 'package:movie_app/presentation/blocs/home_bloc.dart';
 
-void main() async {
- await di.initInjectors();
+import 'injector.dart';
+import 'utils/theme.dart';
+
+void main()  {
+  di.setup();
   runApp(const MyApp());
 }
 
@@ -20,10 +20,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => LandingBloc(),),
-        BlocProvider(create: (context) => HomeBloc(trendingMovieUseCase: serviceLocator(),
-        userUseCase: serviceLocator()),),
-        BlocProvider(create: (context) => MovieDetailsBloc(trendingMovieUseCase: serviceLocator(),watchListUseCase: serviceLocator()),),
+        BlocProvider(create: (context) => getIt<HomeBloc>()..add(FetchMoviesEvent())),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -31,11 +28,13 @@ class MyApp extends StatelessWidget {
         darkTheme: ThemeData.dark(useMaterial3: true,),
         theme: ThemeData(
             useMaterial3: true, scaffoldBackgroundColor: Colors.black,
+        textTheme: buildTextTheme(),
         appBarTheme: const AppBarTheme(
           color: Colors.black,
         )),
-        initialRoute: Routes.landing,
-        onGenerateRoute: Routes.onGenerateRoute,
+        initialRoute: AppRoutes.home,
+
+        onGenerateRoute: AppRoutes.onGenerateRoute,
       ),
     );
   }

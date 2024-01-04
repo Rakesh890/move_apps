@@ -1,24 +1,12 @@
-import 'package:dio/src/response.dart';
+abstract class AppException{}
 
-abstract class AppException {}
+class GeneralException extends AppException{
 
-class FetchDataException extends AppException {}
+  String? message;
 
-class BadRequestException extends AppException {
-  BadRequestException(List<Response?> list);
+  GeneralException({this.message});
+
 }
 
-class UnauthorisedException extends AppException {}
-
-class InvalidInputException extends AppException {}
-
-class GeneralException extends AppException {}
-
-class InternalServerError extends AppException {}
-
-class SocketException extends AppException {}
-
-class ForbiddenException extends AppException{}
-
-class FormatException extends AppException{}
+class FormatException  extends AppException{}
 
